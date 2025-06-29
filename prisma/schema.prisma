@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum LogEvent {
+  REFERRAL
+  REFERRED
+  FRIEND_ADDED
+  FRIEND_REMOVED
+}
+
+model User {
+  id              String          @id @default(uuid())
+  username        String          @unique
+  referred        Referral[]      @relation("Referrer")
+  referrer        Referral?       @relation("Referred")
+  networkStrength Int
+  referralPoints  Int
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  friend1 Friend[] @relation("FriendOne")
+  friend2 Friend[] @relation("FriendTwo")
+
+  activityLogs     ActivityLog[]
+}
+
+model Referral {
+  id              String          @id @default(uuid())
+
+  referrer        User            @relation("Referrer", fields: [referrerId], references: [id])
+  referrerId      String
+  referrerName    String          
+
+  referred        User            @relation("Referred", fields: [referredId], references: [id])
+  referredId      String          @unique
+  referredName    String
+
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@unique([referrerId, referredId])
+}
+
+model Friend {
+  id              String          @id @default(uuid())
+
+  user1           User            @relation("FriendOne", fields: [user1Id], references: [id])
+  user1Id         String
+  user1Name       String
+
+  user2           User            @relation("FriendTwo", fields: [user2Id], references: [id])
+  user2Id         String
+  user2Name       String
+  
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  @@unique([user1Id, user2Id])
+}
+
+model ActivityLog {
+  id              String          @id @default(uuid())
+  user            User            @relation(fields: [userId], references: [id])
+  userId          String
+  amount          Int
+  reason          LogEvent   
+  createdAt       DateTime        @default(now())
+}
