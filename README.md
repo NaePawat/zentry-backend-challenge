@@ -66,10 +66,12 @@ Hello! This project is a RESTful API for fetching user data, update friends, ref
     The application API should now be running and accessible at `http://localhost:3000` (or the `PORT` you set in your `.env` file).
 
 ### Cleaning up the data in database
+
     To clean up the data from the generators run:
     ```bash
        npx prisma migrate reset --force
     ```
+    
     Then reset the data tables in the database
     ```bash
        npx prisma db push
