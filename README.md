@@ -67,15 +67,14 @@ Hello! This project is a RESTful API for fetching user data, update friends, ref
 
 ### Cleaning up the data in database
 
-    To clean up the data from the generators run:
-    ```bash
-       npx prisma migrate reset --force
-    ```
-    
-    Then reset the data tables in the database
-    ```bash
-       npx prisma db push
-    ```
+To reset the data for the database container, run:
+```bash
+npx prisma migrate reset --force
+```
+Then updating the schema to the database:
+```bash
+npx prisma db push
+```
 
 ### Stopping the Application
 
