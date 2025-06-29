@@ -14,9 +14,7 @@ Hello! This project is a RESTful API for fetching user data, update friends, ref
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running for testing.
-
-### Prerequisites
+### What you need
 
 *   **Docker Desktop**: for running the dockerize backend.
 *   **Git**: To clone the repository.
