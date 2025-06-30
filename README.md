@@ -30,7 +30,7 @@ Hello! This project is a RESTful API for fetching user data, update friends, ref
 
 2.  **Create a `.env` file at the root of the project:**
     ```env
-        PORT=3000
+        PORT=5000
         DATABASE_URL=postgresql://postgres:postgres@postgres:5432/bacefook-zentry-postgres
         POSTGRES_USER=postgres
         POSTGRES_PASSWORD=postgres

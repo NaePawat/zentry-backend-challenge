@@ -1,5 +1,6 @@
 import { StartCronJob } from "./cronjob";
 import express from "express";
+import cors from "cors";
 import dotenv from "dotenv";
 import usersRoutes from './routes/users';
 import leaderboardRoutes from './routes/leaderboard';
@@ -10,6 +11,11 @@ dotenv.config();
 
 const app = express()
 
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true,
+}));
+
 app.use(express.json());
 
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
@@ -18,7 +24,7 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.get('/', (req, res) => {
     res.json({ 
         message: "Bacefook (???) is running!",
-        documentation: `API documentation available at http://localhost:${process.env.PORT || 3000}/docs`
+        documentation: `API documentation available at http://localhost:${process.env.PORT || 5000}/docs`
     });
 });
 

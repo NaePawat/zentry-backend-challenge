@@ -6,6 +6,7 @@ import { RegisterEvent, ReferralEvent, AddFriendEvent, UnfriendEvent, Connection
 import { LogEvent } from "@prisma/client";
 
 export const StartCronJob = async () => {
+    return;
     const cronJobController = new CronJobController();
     const generator = new EventsGenerator();
     cron.schedule(`*/${GENERATE_FREQUENCY} * * * * *`, async () => {

@@ -7,6 +7,7 @@
     "test": "jest"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.19",
     "@types/express": "^5.0.2",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.15.29",
@@ -22,6 +23,7 @@
   },
   "dependencies": {
     "@prisma/client": "^6.10.1",
+    "cors": "^2.8.5",
     "dotenv": "^16.6.0",
     "express": "^5.1.0",
     "node-cron": "^4.1.1",
