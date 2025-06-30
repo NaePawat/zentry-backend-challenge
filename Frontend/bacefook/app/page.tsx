@@ -18,10 +18,7 @@ const Home = async() => {
         </p>
         <div className="grid grid-cols-4 gap-[4px]">
           {resJson.users.map((user: any) => 
-            <UserButton
-              key={user.id}
-              username={user.username}
-            />
+            <UserButton key={user.id} username={user.username}/>
           )}
         </div>
       </main>
