@@ -15,7 +15,7 @@ export const StartCronJob = async () => {
         const addFriendEvents = events!.filter((e) => e.type === "addfriend");
         const unfriendEvents = events!.filter((e) => e.type === "unfriend");
 
-        await cronJobController.RegisterUsers(registerEvents)
+        await cronJobController.RegisterUsers(registerEvents);
         await cronJobController.ReferUsers(referralEvents);
         await cronJobController.AddFriends(addFriendEvents);
         await cronJobController.Unfriends(unfriendEvents);
