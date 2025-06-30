@@ -25,7 +25,7 @@ Hello! This project is a RESTful API for fetching user data, update friends, ref
 1.  **Clone the repository:**
     ```bash
     git clone https://github.com/NaePawat/zentry-backend-challenge.git
-    cd zentry-backend-challenge
+    cd zentry-backend-challenge/Backend
     ```
 
 2.  **Create a `.env` file at the root of the project:**
