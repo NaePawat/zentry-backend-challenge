@@ -18,7 +18,7 @@ export const GetActivityLog = async (req: Request, res: Response) => {
             },
         });
 
-        res.status(200).json(logs);
+        res.status(201).json(logs);
     } catch (err) {
         res.status(500).json({ error: 'Server error' });
     }
@@ -62,7 +62,7 @@ export const GetNetworkStrengthLeaderboard = async (req: Request, res: Response)
             take: 10,
         });
 
-        const userIds = leaderboard.map(user => user.userId);
+        const userIds = leaderboard != undefined ? leaderboard.map(user => user.userId) : [];
 
         const users = await prisma.user.findMany({
             where: { 
@@ -79,15 +79,16 @@ export const GetNetworkStrengthLeaderboard = async (req: Request, res: Response)
         });
 
         const response: GetNetworkStrengthLeaderboardResponse = {
-            leaderboard: users.map(user => ({
+            leaderboard: users != undefined ? users.map(user => ({
                 id: user.id,
                 username: user.username,
                 networkStrength: user.networkStrength
-            }))
+            })) : []
         }
 
-        res.status(200).json(response);
+        res.status(201).json(response);
     } catch (err) {
+        console.log(err)
         res.status(500).json({ error: 'Server error' });
     }
 }
@@ -131,7 +132,7 @@ export const GetReferralPointsLeaderboard = async (req: Request, res: Response) 
             take: 10,
         });
 
-        const userIds = leaderboard.map(user => user.userId);
+        const userIds = leaderboard != undefined ? leaderboard.map(user => user.userId) : [];
 
         const users = await prisma.user.findMany({
             where: { 
@@ -148,14 +149,14 @@ export const GetReferralPointsLeaderboard = async (req: Request, res: Response) 
         });
 
         const response: GetReferralPointsLeaderboardResponse = {
-            leaderboard: users.map(user => ({
+            leaderboard: users != undefined ? users.map(user => ({
                 id: user.id,
                 username: user.username,
                 referralPoints: user.referralPoints
-            }))
+            })) : []
         }
 
-        res.status(200).json(response);
+        res.status(201).json(response);
     } catch (err) {
         res.status(500).json({ error: 'Server error' });
     }

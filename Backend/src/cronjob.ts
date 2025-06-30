@@ -79,9 +79,7 @@ export class CronJobController {
                 const referral = await prisma.referral.create({
                     data: {
                         referrerId: referrerUser.id,
-                        referrerName: referrerUser.username,
                         referredId: referredUser.id,
-                        referredName: referredUser.username,
                     }
                 }).catch((err) => {
                     console.error(`[ReferUsers] Error adding relationship ${e.user} referred by :${e.referredBy}`);
@@ -103,9 +101,7 @@ export class CronJobController {
                             connect: { 
                                 id: referral.id,
                                 referrerId: referral.referrerId,
-                                referrerName: referral.referrerName,
                                 referredId: referral.referredId,
-                                referredName: referral.referredName
                             }
                         }
                     }
@@ -174,9 +170,7 @@ export class CronJobController {
                 await prisma.friend.create({
                     data: {
                         user1Id: user1.id,
-                        user1Name: user1.username,
                         user2Id: user2.id,
-                        user2Name: user2.username,
                     }   
                 }).catch((err) => {
                     console.error(`[AddFriend] Error adding friendship between ${e.user1_name} and ${e.user2_name}`, err);

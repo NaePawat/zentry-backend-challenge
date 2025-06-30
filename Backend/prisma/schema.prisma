@@ -35,11 +35,9 @@ model Referral {
 
   referrer        User            @relation("Referrer", fields: [referrerId], references: [id])
   referrerId      String
-  referrerName    String          
 
   referred        User            @relation("Referred", fields: [referredId], references: [id])
   referredId      String          @unique
-  referredName    String
 
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt
@@ -52,11 +50,9 @@ model Friend {
 
   user1           User            @relation("FriendOne", fields: [user1Id], references: [id])
   user1Id         String
-  user1Name       String
 
   user2           User            @relation("FriendTwo", fields: [user2Id], references: [id])
   user2Id         String
-  user2Name       String
   
   createdAt       DateTime        @default(now())
   updatedAt       DateTime        @updatedAt

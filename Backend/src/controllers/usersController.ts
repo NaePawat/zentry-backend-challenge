@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import { z } from 'zod';
 import { UserSchema, FriendQuerySchema, ReferralQuerySchema } from '../lib/zod';
 import { GetFriendsResponse, GetUserResponse, GetUsersResponse, GetTopInfluencialFriendsResponse, GetReferralsResponse } from '../types/response';
-import { Referral } from '../types/model';
+import { Friend, Referral } from '../types/model';
 
 /**
  * Controller for handling fetching list of users data.
@@ -15,22 +15,17 @@ export const GetUsers = async (req: Request, res: Response) => {
     try {
         const users = await prisma.user.findMany();
 
-        if (!users || users.length === 0) {
-            res.status(404).json({ error: 'User not found' });
-            return;
-        }
-
         const response : GetUsersResponse = {
-            users: users.map(user => ({
+            users: users != undefined ? users.map(user => ({
                 id: user.id,
                 username: user.username,
                 networkStrength: user.networkStrength,
                 referralPoints: user.referralPoints,
                 createdAt: user.createdAt.toISOString(),
-            }))
+            })) : []
         }
 
-        res.status(200).json(response);
+        res.status(201).json(response);
     } catch (err) {
         if (err instanceof z.ZodError)
             res.status(400).json({ error: err.errors });
@@ -74,13 +69,30 @@ export const GetUser = async (req: Request, res: Response) => {
             },
             select: {
                 id: true,
-                user1Name: true,
-                user2Name: true,
+                user1Id: true,
+                user2Id: true,
                 createdAt: true
             }
         });
 
-        const referrals = await prisma.referral.findMany({
+        const friends : Friend[] = friendships != undefined ?await Promise.all(friendships.map(async friendship => {
+            const friendId = friendship.user1Id === user.id ? friendship.user2Id : friendship.user1Id;
+            const friend = await prisma.user.findUnique({
+                where: {
+                    id : friendId
+                } 
+            });
+
+            const result : Friend = {
+                id: friendship.id,
+                username: friend!.username,
+                createdAt: friendship.createdAt.toISOString()
+            }
+
+            return result
+        })) : [];
+
+        const referralsList = await prisma.referral.findMany({
             where: {
                 referrerId: user.id
             },
@@ -90,10 +102,26 @@ export const GetUser = async (req: Request, res: Response) => {
             select: {
                 id: true,
                 referredId: true,
-                referredName: true,
                 createdAt: true
             }
         });
+
+        const referrals : Referral[] = referralsList != undefined ? await Promise.all(referralsList.map(async ref => {
+            const referredUser = await prisma.user.findUnique({
+                where: {
+                    id : ref.referredId
+                }
+            });
+
+            const result : Referral = {
+                id : ref.id,
+                referredId : ref.referredId,
+                username : referredUser!.username,
+                createdAt : ref.createdAt.toISOString()
+            }
+
+            return result;
+        })) : [];
 
         const response : GetUserResponse = {
             user: {
@@ -103,26 +131,12 @@ export const GetUser = async (req: Request, res: Response) => {
                 referralPoints: user?.referralPoints || 0,
                 createdAt: user?.createdAt.toISOString() || ''
             },
-            friends: friendships.map(friendship => {
-                return {
-                    id: friendship.id,
-                    username: friendship.user1Name === username ? 
-                        friendship.user2Name : friendship.user1Name,
-                    createdAt: friendship.createdAt.toISOString()
-                };
-            }),
+            friends: friends,
             referredBy: user.referrer as Referral | null,
-            referrals: referrals.map(referral => {
-                return {
-                    id: referral.id,
-                    referredId: referral.referredId,
-                    username: referral.referredName,
-                    createdAt: referral.createdAt.toISOString(),
-                };
-            })
+            referrals: referrals
         }
 
-        res.status(200).json(response);
+        res.status(201).json(response);
     } catch (err) {
         if (err instanceof z.ZodError)
             res.status(400).json({ error: err.errors });
@@ -195,27 +209,37 @@ export const GetUserFriends = async (req: Request, res: Response) => {
             take: limit,
             select: {
                 id: true,
-                user1Name: true,
-                user2Name: true,
+                user1Id: true,
+                user2Id: true,
                 createdAt: true
             }
         });
+
+        const friends : Friend[] = friendships != undefined ? await Promise.all(friendships.map(async friendship => {
+            const friendId = friendship.user1Id === user.id ? friendship.user2Id : friendship.user1Id;
+            const friend = await prisma.user.findUnique({
+                where: {
+                    id : friendId
+                } 
+            });
+
+            const result : Friend = {
+                id: friendship.id,
+                username: friend!.username,
+                createdAt: friendship.createdAt.toISOString()
+            }
+
+            return result
+        })) : [];
 
         const response : GetFriendsResponse = {
             currentPage: page,
             totalPages: totalPages,
             totalFriends: totalFriends,
-            friends: friendships.map(friendship => {
-                return {
-                    id: friendship.id,
-                    username: friendship.user1Name === username ? 
-                        friendship.user2Name : friendship.user1Name,
-                    createdAt: friendship.createdAt.toISOString()
-                };
-            })
+            friends: friends
         }
 
-        res.status(200).json(response);
+        res.status(201).json(response);
     } catch (err) {
         if (err instanceof z.ZodError)
             res.status(400).json({ error: err.errors });
@@ -281,15 +305,15 @@ export const GetUserTopInfluentialFriends = async (req: Request, res: Response) 
         });
 
         const response: GetTopInfluencialFriendsResponse = {
-            friends: topFriends.map(friend => ({
+            friends: topFriends != undefined ? topFriends.map(friend => ({
                 id: friend.id,
                 username: friend.username,
                 networkStrength: friend.networkStrength,
                 createdAt: friend.createdAt.toISOString()
-            }))
+            })) :[]
         }
 
-        res.status(200).json(response);
+        res.status(201).json(response);
     } catch (err) {
         if (err instanceof z.ZodError)
             res.status(400).json({ error: err.errors });
@@ -335,7 +359,7 @@ export const GetUserReferrals = async (req: Request, res: Response) => {
             },
         });
 
-        const referrals = await prisma.referral.findMany({
+        const referralsList = await prisma.referral.findMany({
             where: {
                 referrerId: user.id,
                 createdAt: {
@@ -349,24 +373,33 @@ export const GetUserReferrals = async (req: Request, res: Response) => {
             select: {
                 id: true,
                 referredId: true,
-                referredName: true,
                 createdAt: true
             }
         });
 
+        const referrals : Referral[] = referralsList != undefined ? await Promise.all(referralsList.map(async ref => {
+            const referredUser = await prisma.user.findUnique({
+                where: {
+                    id : ref.referredId
+                }
+            });
+
+            const result : Referral = {
+                id : ref.id,
+                referredId : ref.referredId,
+                username : referredUser!.username,
+                createdAt : ref.createdAt.toISOString()
+            }
+
+            return result;
+        })) : [];
+
         const response: GetReferralsResponse = {
             totalReferrals: totalReferrals,
-            referrals: referrals.map(referral => {
-                return {
-                    id: referral.id,
-                    referredId: referral.referredId,
-                    username: referral.referredName,
-                    createdAt: referral.createdAt.toISOString(),
-                };
-            })
+            referrals: referrals
         }
 
-        res.status(200).json(response);
+        res.status(201).json(response);
     } catch (err) {
         if (err instanceof z.ZodError)
             res.status(400).json({ error: err.errors });

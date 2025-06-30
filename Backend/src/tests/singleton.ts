@@ -1,4 +1,14 @@
 import { PrismaClient } from '@prisma/client';
-import { mockDeep, DeepMockProxy } from 'jest-mock-extended';
+import { mockDeep, mockReset, DeepMockProxy } from 'jest-mock-extended';
+import prisma from '../lib/prisma';
 
-export const prismaMock = mockDeep<PrismaClient>() as DeepMockProxy<PrismaClient>;
+jest.mock('../lib/prisma', () => ({
+  __esModule: true,
+  default: mockDeep<PrismaClient>()
+}));
+
+beforeEach(() => {
+  mockReset(prismaMock);
+});
+
+export const prismaMock = prisma as unknown as DeepMockProxy<PrismaClient>;
