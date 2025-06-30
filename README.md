@@ -63,7 +63,7 @@ Hello! This project is a RESTful API for fetching user data, update friends, ref
         exit
     ```
 
-    The application API should now be running and accessible at `http://localhost:3000` (or the `PORT` you set in your `.env` file).
+    The application API should now be running and accessible at `http://localhost:5000` (or the `PORT` you set in your `.env` file).
 
 ### Cleaning up the data in database
 
@@ -91,9 +91,9 @@ docker-compose down -v
 
 you can access the API documentation in your browser at:
 
-*   **`http://localhost:3000/docs`** (or `http://localhost:${PORT}/docs` if you have configured a different `PORT` in your `.env` file).
+*   **`http://localhost:5000/docs`** (or `http://localhost:${PORT}/docs` if you have configured a different `PORT` in your `.env` file).
 
 ## Testing the API
 
 You can test the API in postman
-The base URL for the API is `http://localhost:3000/api` (or `http://localhost:${PORT}/api` if you changed the `PORT` in `.env`).
+The base URL for the API is `http://localhost:5000/api` (or `http://localhost:${PORT}/api` if you changed the `PORT` in `.env`).
