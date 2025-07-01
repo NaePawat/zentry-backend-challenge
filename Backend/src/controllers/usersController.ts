@@ -1,9 +1,10 @@
 import prisma from '../lib/prisma';
 import { Request, Response } from 'express';
+import { addMinutes, formatISO, setMilliseconds, setMinutes, setSeconds, startOfMinute } from 'date-fns'
 import { z } from 'zod';
 import { UserSchema, FriendQuerySchema, ReferralQuerySchema } from '../lib/zod';
 import { GetFriendsResponse, GetUserResponse, GetUsersResponse, GetTopInfluencialFriendsResponse, GetReferralsResponse } from '../types/response';
-import { Friend, Referral, Referrer } from '../types/model';
+import { Friend, Referral, Referrer, TimeSeriesGraphData } from '../types/model';
 
 /**
  * Controller for handling fetching list of users data.
@@ -267,6 +268,84 @@ export const GetUserFriends = async (req: Request, res: Response) => {
 }
 
 /**
+ * Controller for handling fetching user's friends time series data from displaying graph in frontend.
+ * return the list of data in 1 min interval until current time (for our testing, 1 day interval might be too long)
+ * 
+ * @module controllers/usersController
+ */
+
+export const GetUserFriendsTimeSeriesData = async (req: Request, res: Response) => {
+    try {
+        const { username } = UserSchema.parse(req.params);
+        const { from, to } = ReferralQuerySchema.parse(req.query);
+
+        const fromDate = new Date(from);
+        const toDate = new Date(to);
+
+        const user = await prisma.user.findUnique({
+            where: {
+                username: username
+            }
+        });
+
+        if (!user) {
+            res.status(404).json({ error: 'User not found' });
+            return;
+        }
+
+        const friendEvents = await prisma.activityLog.findMany({
+            where: { 
+                userId: user.id,
+                createdAt: { gte: fromDate, lte: toDate },
+                reason: { in: ["FRIEND_ADDED", "FRIEND_REMOVED"]} 
+            },
+            
+            orderBy: { createdAt: 'asc' },
+        });
+
+        const result: TimeSeriesGraphData[] = [];
+
+        if (friendEvents.length == 0 || friendEvents == undefined)
+        {
+            res.status(201).json(result);
+            return;
+        } 
+
+        const timeMap = new Map<string, number>();
+
+        for (const event of friendEvents) {
+            const minuteKey = startOfMinute(event.createdAt).toISOString();
+            const delta = event.reason === 'FRIEND_ADDED' ? 1 : -1;
+            timeMap.set(minuteKey, (timeMap.get(minuteKey) || 0) + delta);
+        }
+        
+        const startTime = startOfMinute(friendEvents[0].createdAt);
+        const endTime = startOfMinute(friendEvents[friendEvents.length - 1].createdAt);
+
+        let currentTime = startTime;
+        let count = 0;
+
+        while (currentTime <= endTime) {
+            const key = currentTime.toISOString();
+            if (timeMap.has(key)) {
+                count += timeMap.get(key)!;
+            }
+            result.push({
+                date: key,
+                count,
+            });
+            currentTime = addMinutes(currentTime, 1);
+        }
+
+        res.status(201).json(result);
+    } catch (err) {
+        if (err instanceof z.ZodError)
+            res.status(400).json({ error: err.errors });
+        res.status(500).json({ error: 'Server error' });
+    }
+}
+
+/**
  * Controller for handling fetching user's top influential friends.
  * returns the list of top 3 friends that have the most referral points + network strength..
  * 
@@ -419,6 +498,88 @@ export const GetUserReferrals = async (req: Request, res: Response) => {
         }
 
         res.status(201).json(response);
+    } catch (err) {
+        if (err instanceof z.ZodError)
+            res.status(400).json({ error: err.errors });
+        res.status(500).json({ error: 'Server error' });
+    }
+}
+
+/**
+ * Controller for handling fetching user's referrals time series data from displaying graph in frontend.
+ * return the list of data in 1 min interval until current time (for our testing, 1 day interval might be too long)
+ * 
+ * @module controllers/usersController
+ */
+
+export const GetUserReferralsTimeSeriesData = async (req: Request, res: Response) => {
+    try {
+        const { username } = UserSchema.parse(req.params);
+        const { from, to } = ReferralQuerySchema.parse(req.query);
+
+        const fromDate = new Date(from);
+        const toDate = new Date(to);
+
+        if (fromDate > toDate) {
+            res.status(400).json({ error: "'from' is later than 'to' date" });
+            return;
+        }
+
+        const user = await prisma.user.findUnique({
+            where: {
+                username: username
+            }
+        });
+
+        if (!user) {
+            res.status(404).json({ error: 'User not found' });
+            return;
+        }
+
+        const referralEvents = await prisma.activityLog.findMany({
+            where: { 
+                userId: user.id,
+                createdAt: { gte: fromDate, lte: toDate },
+                reason: "REFERRAL"
+            },
+            
+            orderBy: { createdAt: 'asc' },
+        });
+
+        const result: TimeSeriesGraphData[] = [];
+
+        if (referralEvents.length == 0 || referralEvents == undefined)
+        {
+            res.status(201).json(result);
+            return;
+        } 
+
+        const timeMap = new Map<string, number>();
+
+        for (const event of referralEvents) {
+            const minuteKey = startOfMinute(event.createdAt).toISOString();
+            timeMap.set(minuteKey, (timeMap.get(minuteKey) || 0) + 1);
+        }
+        
+        const startTime = startOfMinute(referralEvents[0].createdAt);
+        const endTime = startOfMinute(referralEvents[referralEvents.length - 1].createdAt);
+
+        let currentTime = startTime;
+        let count = 0;
+
+        while (currentTime <= endTime) {
+            const key = currentTime.toISOString();
+            if (timeMap.has(key)) {
+                count += timeMap.get(key)!;
+            }
+            result.push({
+                date: key,
+                count,
+            });
+            currentTime = addMinutes(currentTime, 1);
+        }
+
+        res.status(201).json(result);
     } catch (err) {
         if (err instanceof z.ZodError)
             res.status(400).json({ error: err.errors });

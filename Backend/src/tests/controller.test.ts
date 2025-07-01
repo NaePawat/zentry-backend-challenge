@@ -1,10 +1,11 @@
 import { prismaMock } from './singleton';
-import { GetUsers, GetUser, GetUserFriends, GetUserReferrals, GetUserTopInfluentialFriends } from '../controllers/usersController'
+import { GetUsers, GetUser, GetUserFriends, GetUserReferrals, GetUserTopInfluentialFriends, GetUserFriendsTimeSeriesData, GetUserReferralsTimeSeriesData } from '../controllers/usersController'
 import { GetActivityLog, GetNetworkStrengthLeaderboard, GetReferralPointsLeaderboard } from '../controllers/leaderboardController'
 import httpMocks from 'node-mocks-http'
 import { Request, Response } from 'express';
 import { ParamsDictionary } from 'express-serve-static-core';
 import { ParsedQs } from 'qs';
+import { LogEvent } from '@prisma/client';
 
 const mockUser = {
     id: "1234",
@@ -21,6 +22,14 @@ const mockFriend = {
     user2Id : "3456",
     createdAt : new Date(),
     updatedAt : new Date()
+}
+
+const mockActivityLog = {
+    id: "3456",
+    userId: "0",
+    amount: 1,
+    createdAt : new Date(),
+    reason : "REFERRAL" as LogEvent
 }
 
 describe("Controllers", () => {
@@ -70,6 +79,19 @@ describe("Controllers", () => {
         expect(res.statusCode).toBe(201)
     });
 
+    it("[GetUserFriendsTimeSeriesData] should call queries and return 201 code", async () => {
+        prismaMock.user.findUnique.mockResolvedValue(mockUser)
+        prismaMock.activityLog.findMany.mockResolvedValue([mockActivityLog])
+
+        req.query.from = "2025-06-29T03:00:00Z"
+        req.query.to = "2025-07-29T03:00:00Z"
+
+        await GetUserFriendsTimeSeriesData(req, res)
+        expect(prismaMock.user.findUnique).toHaveBeenCalled()
+        expect(prismaMock.activityLog.findMany).toHaveBeenCalled()
+        expect(res.statusCode).toBe(201)
+    });
+
     it("[GetUserTopInfluencialFriends] should call queries and return 201 code", async () => {
         prismaMock.user.findUnique.mockResolvedValue(mockUser)
         prismaMock.friend.findMany.mockResolvedValue([mockFriend, mockFriend, mockFriend])
@@ -89,6 +111,19 @@ describe("Controllers", () => {
         await GetUserReferrals(req, res)
         expect(prismaMock.user.findUnique).toHaveBeenCalled()
         expect(prismaMock.referral.findMany).toHaveBeenCalled()
+        expect(res.statusCode).toBe(201)
+    });
+
+    it("[GetUserReferralsTimeSeriesData] should call queries and return 201 code", async () => {
+        prismaMock.user.findUnique.mockResolvedValue(mockUser)
+        prismaMock.activityLog.findMany.mockResolvedValue([mockActivityLog])
+
+        req.query.from = "2025-06-29T03:00:00Z"
+        req.query.to = "2025-07-29T03:00:00Z"
+
+        await GetUserReferralsTimeSeriesData(req, res)
+        expect(prismaMock.user.findUnique).toHaveBeenCalled()
+        expect(prismaMock.activityLog.findMany).toHaveBeenCalled()
         expect(res.statusCode).toBe(201)
     });
 

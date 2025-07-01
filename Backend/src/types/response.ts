@@ -1,4 +1,4 @@
-import { User, Referral, Friend, InfluencialFriend, Referrer } from "./model";
+import { User, Referral, Friend, InfluencialFriend, Referrer, TimeSeriesGraphData } from "./model";
 
 //#region User Responses
 export interface GetUsersResponse {
@@ -17,6 +17,10 @@ export interface GetFriendsResponse {
     totalPages: number;
     totalFriends: number;
     friends: Friend[];
+}
+
+export interface GetFriendsTimeSeriesResponse {
+    data: TimeSeriesGraphData[]
 }
 
 export interface GetTopInfluencialFriendsResponse {

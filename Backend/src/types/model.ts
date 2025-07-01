@@ -28,3 +28,8 @@ export interface Friend {
 export interface InfluencialFriend extends Friend {
     networkStrength: number;
 }
+
+export interface TimeSeriesGraphData {
+    date: string;
+    count: number
+}

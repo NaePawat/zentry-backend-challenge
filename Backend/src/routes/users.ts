@@ -1,5 +1,5 @@
 import express from 'express';
-import { GetUsers, GetUser, GetUserFriends, GetUserTopInfluentialFriends, GetUserReferrals } from '../controllers/usersController';
+import { GetUsers, GetUser, GetUserFriends, GetUserTopInfluentialFriends, GetUserReferrals, GetUserFriendsTimeSeriesData, GetUserReferralsTimeSeriesData } from '../controllers/usersController';
 
 const router = express.Router();
 
@@ -101,6 +101,47 @@ router.get('/:username/friends', GetUserFriends);
 
 /**
  * @openapi
+ * /api/users/{username}/friends/graph:
+ *   get:
+ *     summary: Get user friends time series graph data
+ *     description: Retrieve a plot points for time series graph to display in frontend
+ *     tags:
+ *       - Users
+ *     parameters:
+ *       - name: username
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: johndoe
+ *       - name: from
+ *         in: query
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: date
+ *         example: 2025-06-01
+ *       - name: to
+ *         in: query
+ *         required: true
+ *         schema:
+ *           type: string
+ *           format: date
+ *         example: 2025-06-30
+ *     responses:
+ *       200:
+ *         description: User data retrieved successfully
+ *       400:
+ *         description: Invalid parameters
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Internal server error
+ */
+router.get('/:username/friends/graph', GetUserFriendsTimeSeriesData);
+
+/**
+ * @openapi
  * /api/users/{username}/friends/top-influential:
  *   get:
  *     summary: Get top influential friends of a user
@@ -166,5 +207,46 @@ router.get('/:username/friends/top-influential', GetUserTopInfluentialFriends);
  *         description: Internal server error
  */
 router.get('/:username/referrals', GetUserReferrals);
+
+/**
+ * @openapi
+ * /api/users/{username}/referrals/graph:
+ *   get:
+ *     summary: Get user referrals time series graph data
+ *     description: Retrieve a plot points for time series graph to display in frontend
+ *     tags:
+ *       - Users
+ *     parameters:
+ *       - name: username
+ *         in: path
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: johndoe
+ *       - name: from
+ *         in: query
+ *         required: false
+ *         schema:
+ *           type: string
+ *           format: date
+ *         example: 2025-06-01
+ *       - name: to
+ *         in: query
+ *         required: false
+ *         schema:
+ *           type: string
+ *           format: date
+ *         example: 2025-06-30
+ *     responses:
+ *       200:
+ *         description: User referrals retrieved successfully
+ *       400:
+ *         description: Invalid parameters
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Internal server error
+ */
+router.get('/:username/referrals/graph', GetUserReferralsTimeSeriesData);
 
 export default router;

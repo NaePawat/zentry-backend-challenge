@@ -12,6 +12,14 @@ const UserPage = async ({ params }: { params: Promise<{ id: string }> }) => {
   const topThreeFriendsRes = await fetch(`http://localhost:5000/api/users/${id}/friends/top-influential`);
   const topThreeFriendsJson = await topThreeFriendsRes.json();
 
+  //TODO: date selection feature is not implemented, this should be fetch later when user input the time range
+  const friendsTimeSeriesData = await fetch(`http://localhost:5000/api/users/${id}/friends/graph?from=2025-06-29T03:00:00Z&to=2025-07-30T22:00:00Z`)
+  const friendsTimeSeriesDataJson = await friendsTimeSeriesData.json();
+
+  //TODO: date selection feature is not implemented, this should be fetch later when user input the time range
+  const referralsTimeSeriesData = await fetch(`http://localhost:5000/api/users/${id}/referrals/graph?from=2025-06-29T03:00:00Z&to=2025-07-30T22:00:00Z`)
+  const referralsTimeSeriesDataJson = await referralsTimeSeriesData.json();
+
   return (
     <div>
         <main>
@@ -57,8 +65,8 @@ const UserPage = async ({ params }: { params: Promise<{ id: string }> }) => {
                 ))}
             </ul>
         </section>
-        <Chart name='Friends Count' data={userDataJson.friends}/>
-        <Chart name='Referrals Count' data={userDataJson.referrals}/>
+        <Chart name='Friends Count' data={friendsTimeSeriesDataJson}/>
+        <Chart name='Referrals Count' data={referralsTimeSeriesDataJson}/>
     </div>
   );
 };
