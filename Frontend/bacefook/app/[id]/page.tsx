@@ -1,5 +1,6 @@
 import React from 'react';
 import UserButton from '../components/userButton';
+import Chart from '../components/chart';
 
 const UserPage = async ({ params }: { params: Promise<{ id: string }> }) => {
   const { id } = await params;
@@ -22,7 +23,7 @@ const UserPage = async ({ params }: { params: Promise<{ id: string }> }) => {
             <p className="text-md text-center sm:text-left text-foreground/60 dark:text-foreground/40">
                 Network Strength: {userDataJson.user.networkStrength} <br />
                 Referral Points: {userDataJson.user.referralPoints} <br />
-                Referred By: {userDataJson.referredBy != null ? userDataJson.referredBy.referrerName : "None"}
+                Referred By: {userDataJson.referredBy != null ? userDataJson.referredBy.username : "None"}
             </p>
         </section>
 
@@ -55,7 +56,9 @@ const UserPage = async ({ params }: { params: Promise<{ id: string }> }) => {
                     <li key={ref.id}>{ref.username}</li>
                 ))}
             </ul>
-    </section>
+        </section>
+        <Chart name='Friends Count' data={userDataJson.friends}/>
+        <Chart name='Referrals Count' data={userDataJson.referrals}/>
     </div>
   );
 };

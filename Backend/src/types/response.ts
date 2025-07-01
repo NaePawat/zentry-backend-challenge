@@ -1,4 +1,4 @@
-import { User, Referral, Friend, InfluencialFriend } from "./model";
+import { User, Referral, Friend, InfluencialFriend, Referrer } from "./model";
 
 //#region User Responses
 export interface GetUsersResponse {
@@ -8,7 +8,7 @@ export interface GetUsersResponse {
 export interface GetUserResponse {
     user: User;
     friends : Friend[]
-    referredBy: Referral | null;
+    referredBy: Referrer | null;
     referrals: Referral[];
 }
 

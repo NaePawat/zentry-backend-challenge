@@ -6,6 +6,12 @@ export interface User {
     createdAt: string;
 }
 
+export interface Referrer {
+    id: string
+    username: string
+    createdAt: string
+}
+
 export interface Referral {
     id: string;
     referredId: string;

@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import { z } from 'zod';
 import { UserSchema, FriendQuerySchema, ReferralQuerySchema } from '../lib/zod';
 import { GetFriendsResponse, GetUserResponse, GetUsersResponse, GetTopInfluencialFriendsResponse, GetReferralsResponse } from '../types/response';
-import { Friend, Referral } from '../types/model';
+import { Friend, Referral, Referrer } from '../types/model';
 
 /**
  * Controller for handling fetching list of users data.
@@ -75,7 +75,7 @@ export const GetUser = async (req: Request, res: Response) => {
             }
         });
 
-        const friends : Friend[] = friendships != undefined ?await Promise.all(friendships.map(async friendship => {
+        const friends : Friend[] = friendships != undefined ? await Promise.all(friendships.map(async friendship => {
             const friendId = friendship.user1Id === user.id ? friendship.user2Id : friendship.user1Id;
             const friend = await prisma.user.findUnique({
                 where: {
@@ -91,6 +91,25 @@ export const GetUser = async (req: Request, res: Response) => {
 
             return result
         })) : [];
+
+        let referrer : Referrer | null = null;
+
+        if (user.referrer != null) {
+            const refUser = await prisma.user.findUnique({
+                where: {
+                    id : user.referrer.referrerId
+                }
+            });
+
+            if (refUser != undefined)
+            {
+                referrer = {
+                    id: refUser.id,
+                    username: refUser.username,
+                    createdAt: refUser.createdAt.toISOString()
+                }
+            }
+        }
 
         const referralsList = await prisma.referral.findMany({
             where: {
@@ -132,7 +151,7 @@ export const GetUser = async (req: Request, res: Response) => {
                 createdAt: user?.createdAt.toISOString() || ''
             },
             friends: friends,
-            referredBy: user.referrer as Referral | null,
+            referredBy: referrer,
             referrals: referrals
         }
 
