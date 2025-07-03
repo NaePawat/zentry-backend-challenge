@@ -1,10 +1,10 @@
-import prisma from '../lib/prisma';
+import prisma from '../lib/prisma.js';
 import { Request, Response } from 'express';
-import { addMinutes, formatISO, setMilliseconds, setMinutes, setSeconds, startOfMinute } from 'date-fns'
+import { addMinutes, startOfMinute } from 'date-fns'
 import { z } from 'zod';
-import { UserSchema, FriendQuerySchema, ReferralQuerySchema } from '../lib/zod';
-import { GetFriendsResponse, GetUserResponse, GetUsersResponse, GetTopInfluencialFriendsResponse, GetReferralsResponse } from '../types/response';
-import { Friend, Referral, Referrer, TimeSeriesGraphData } from '../types/model';
+import { UserSchema, FriendQuerySchema, ReferralQuerySchema } from '../lib/zod.js';
+import { GetFriendsResponse, GetUserResponse, GetUsersResponse, GetTopInfluencialFriendsResponse, GetReferralsResponse } from '../types/response.js';
+import { Friend, Referral, Referrer, TimeSeriesGraphData } from '../types/model.js';
 
 /**
  * Controller for handling fetching list of users data.

@@ -1,5 +1,5 @@
 import express from 'express';
-import { GetUsers, GetUser, GetUserFriends, GetUserTopInfluentialFriends, GetUserReferrals, GetUserFriendsTimeSeriesData, GetUserReferralsTimeSeriesData } from '../controllers/usersController';
+import { GetUsers, GetUser, GetUserFriends, GetUserTopInfluentialFriends, GetUserReferrals, GetUserFriendsTimeSeriesData, GetUserReferralsTimeSeriesData } from '../controllers/usersController.js';
 
 const router = express.Router();
 

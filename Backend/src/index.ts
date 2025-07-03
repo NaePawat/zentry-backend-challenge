@@ -1,11 +1,11 @@
-import { StartCronJob } from "./cronjob";
+import StartCronJob from "./cronjob.js";
 import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import usersRoutes from './routes/users';
-import leaderboardRoutes from './routes/leaderboard';
+import usersRoutes from './routes/users.js';
+import leaderboardRoutes from './routes/leaderboard.js';
 import swaggerUi from 'swagger-ui-express';
-import swaggerSpec from './docs/swaggerConfig';
+import swaggerSpec from './docs/swaggerConfig.js';
 
 dotenv.config();
 

@@ -1,7 +1,7 @@
-import prisma from '../lib/prisma';
+import prisma from '../lib/prisma.js';
 import { Request, Response } from 'express';
-import { LeaderboardQuerySchema } from '../lib/zod';
-import { GetNetworkStrengthLeaderboardResponse, GetReferralPointsLeaderboardResponse } from '../types/response';
+import { LeaderboardQuerySchema } from '../lib/zod.js';
+import { GetNetworkStrengthLeaderboardResponse, GetReferralPointsLeaderboardResponse } from '../types/response.js';
 
 /**
  * Controller for handling fetching activity log requests.

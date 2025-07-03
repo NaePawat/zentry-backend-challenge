@@ -1,9 +1,10 @@
 {
   "name": "bacefook-core",
   "version": "1.0.0",
+  "type": "module",
   "scripts": {
-    "start": "ts-node src/index.ts",
-    "build": "tsc",
+    "start": "node --loader ts-node/esm src/index.ts",
+    "build": "npx tsc",
     "test": "jest"
   },
   "devDependencies": {
@@ -29,6 +30,7 @@
     "dotenv": "^16.6.0",
     "express": "^5.1.0",
     "node-cron": "^4.1.1",
+    "p-limit": "^6.2.0",
     "prisma": "^6.10.1",
     "zod": "^3.25.67"
   }

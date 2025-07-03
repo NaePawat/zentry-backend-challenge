@@ -4,8 +4,8 @@ import {
   ReferralEvent,
   RegisterEvent,
   UnfriendEvent,
-} from "./types";
-import { Utils } from "./utils";
+} from "./types.js";
+import { Utils } from "./utils.js";
 
 export class EventsGenerator {
   private users: string[] = [];
